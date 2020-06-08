@@ -3,6 +3,7 @@
 The goal is to have the RPi itself aswell as any devices connecting through the RPi Wifi hotspot use the PIA VPN and PiHole for adblocking.
 
 Because trying to patch this together broke my previous build, I started from fresh. So this is a good starting point
+# OpenVPN
 ## Preparation
 If you have all of the following already set up you can skip this: Ethernet connection with Static IP, openvpn, proftpd, desktop, dnsmasq, openresolv installed. If not follow these steps:
 
@@ -155,10 +156,116 @@ These are the PIA DNS adresses. If that's all there you're good.
 ### Final test
 Let's test this through the desktop we installed earlier. To enable it, go to 'dietpi-autostart' and choose 'Automatic Login' under 'Desktops' (Should Option 2). Select root, confirm, exit out of the autostart menu and 'reboot'.
 
+Now we open up our VNC Viewer of choice and connect to the Pi. If it's not working and showing "Cannot currently show the desktop", don't cry just yet. Instead, run
+```
+apt-get update -qq
+apt-get upgrade -qq
+reboot
+```
+if it still doesn't work
+
+```
+cp /DietPi/config.txt /DietPi/config.txt.backup
+nano /DietPi/config.txt
+```
+find
+```
+#hdmi_force_hotplug=0
+...
+#hdmi_group=1
+#hdmi_mode=1
+```
+remove the # and change to look like this
+```
+hdmi_force_hotplug=2
+...
+hdmi_group=2
+hdmi_mode=82
+```
+Now we should be on de Pi Desktop. Start up your web browser and go to ipleak.net. If it looks like this, everything is perfect!
+![greatsuccess](https://i.imgur.com/LlEFakw.png)
+
+You can now change the dietpi-autostart back to Automatic Login in Local Terminal.
+
+# Wifi Hotpot
+Now comes the second part of our Triwizard Tournament. Again, I made a backup at this point.
+
+### Installing the access point
+Through 'dietpi-software' select 'WiFi Hotspot'. It does two checks for ethernet connection and wifi adapter. If you FAIL the wifi adapter check, make sure wifi onboard is enabled in 'dietpi-config'. Then you can install.
+
+test with
+```
+systemctl status hostapd.service
+```
+If it spurts errors, check if you have a hostapd.conf in /etc/hostapd. If not, download it from [here](/Files/hostapd.conf) and push it there with FileZilla. Also, if there's a file there, back it up and replace it. Then reboot and try again. We want it to look like this
+
+![hostapd running](https://i.imgur.com/w8TP89x.png)
+
+### Configuring static IP for the wlan0 interface
+```
+nano /etc/dhcpcd.conf
+```
+enter
+```
+interface wlan0
+static ip_address=192.168.0.10/24
+denyinterfaces tun0
+denyinterfaces wlan0
+```
+(Replace 192.168.0.10 with your desired wifi IP)
+
+#### Configure DNSmasq
+First, let's backup the config
+```
+mv /etc/dnsmasq.conf /etc.dnsmasq/conf.backup
+```
+now let's create a new one
+```
+nano /etc/dnsmasq.conf
+```
+and enter:
+```
+interface=wlan0
+  dhcp-range=192.168.0.11,192.168.0.30,255.255.255.0,24h
+```
+The two IPs define the range of IPs for the wlon0 interface.
+
+#### Add new iptables rule
+Next, we’re going to add IP masquerading for outbound traffic on eth0 using iptables:
+```
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+```
+…and save the new iptables rule:
+```
+sh -c "iptables-save > /etc/iptables.ipv4.nat"
+```
+To load the rule on boot, we need to edit the file /etc/rc.local and add the following
+line just above the line exit 0:
+```
+iptables-restore < /etc/iptables.ipv4.nat
+```
+
+#### Bridge our VPN connection to the hotspot
+installing the bridge service
+```
+apt-get install bridge-utils -y
+```
+creating our bridge
+```
+brctl addbr br0
+```
+If there's an error, run 'brctl delbr br0' and try again. Then:
+```
+brctl addif br0 eth0
 
 
-Autosr
+
+
+
 ## Sources
    - https://gist.github.com/superjamie/ac55b6d2c080582a3e64
    - https://github.com/alfredopalhares/openvpn-update-resolv-conf
    - https://forums.openvpn.net/viewtopic.php?t=26388
+   - https://thepi.io/how-to-use-your-raspberry-pi-as-a-wireless-access-point/
+   - https://gist.github.com/renaudcerrato/db053d96991aba152cc17d71e7e0f63c
+   - https://www.cyberciti.biz/faq/ubuntu-linux-install-pi-hole-with-a-openvpn/
