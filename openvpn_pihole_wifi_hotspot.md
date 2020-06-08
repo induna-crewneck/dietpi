@@ -37,10 +37,8 @@ Because trying to patch this together broke my previous build, I started from fr
        ![Installed software](https://i.imgur.com/oTHTjHG.png)
      - and 'dietpi-services' should look like this
        ![Installed services](https://i.imgur.com/Ks6OzZ4.png)
-   
-### Download, edit and push necessary files
-#### Download
-
+       
+(Optional) At this point I made a backup using 'dietpi-backup' because we start editing config files and stuff.
 
 #### Sources
    - https://gist.github.com/superjamie/ac55b6d2c080582a3e64
