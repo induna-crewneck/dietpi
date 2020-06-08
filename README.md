@@ -9,3 +9,22 @@ I'm running DietPi ([Download](https://dietpi.com/downloads/images/DietPi_RPi-AR
 - SSH software: [KiTTY](https://dietpi.com/downloads/binaries/all/Kitty_Portable_DietPi.7z) (logged in as root)
 - FTP software: [FileZilla Client](https://filezilla-project.org/) (usually logged in as dietpi, not as root)
 - VNC software: [RealVNC VNC Viewer](https://www.realvnc.com/de/connect/download/viewer/) (logged in as root)
+
+## Usefull stuff
+
+####  Useful apps
+Zip and Unzip
+```
+apt-get install zip && apt-get install unzip 
+```
+#### FTP setup
+Install proftpd through the 'dietpi-software' GUI
+##### FTP with root permissions:
+```
+nano  /etc/proftpd/proftpd.conf
+```
+Find 'RootLogin' and change 'off' to 'on'.
+##### change FTP start folder
+In the same file (proftpd.conf) look for 'Default Root' (should be /mnt/dietpi_userdata). Just change it to '/'
+![Should look like this](https://i.imgur.com/X1P8eL5.png)
+Exit and save with Ctrl+X and confirm with Y and then Enter.
