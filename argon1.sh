@@ -40,6 +40,8 @@ removescript=/usr/bin/argonone-uninstall
 
 daemonfanservice=/lib/systemd/system/$daemonname.service
 
+#working until here. next two commands aren't wroking with DietPi
+
 dietpi-config nonint do_i2c 0
 dietpi-config nonint do_serial 0	
 	
