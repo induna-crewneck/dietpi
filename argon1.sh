@@ -24,9 +24,7 @@ for curpkg in ${pkglist[@]}; do
 	RESULT=$(argon_check_pkg "$curpkg")
 	if [ "NG" == "$RESULT" ]
 	then
-		echo "********************************************************************"
 		echo "Please also connect device to the internet and restart installation."
-		echo "********************************************************************"
 		exit
 	fi
 done
