@@ -40,10 +40,14 @@ removescript=/usr/bin/argonone-uninstall
 
 daemonfanservice=/lib/systemd/system/$daemonname.service
 
-#working until here. next two commands aren't wroking with DietPi
-
-dietpi-config nonint do_i2c 0
-dietpi-config nonint do_serial 0	
+# next two commands aren't wroking with DietPi. Cause the script to abort
+/boot/dietpi/raspi-config nonint do_i2c 0
+#	enables i2c
+#	#define SET_I2C 
+/boot/dietpi/raspi-config nonint do_serial 0
+#	enables serial (1=disable)
+"#	#define SET_SERIAL
+# 	source: https://raspberrypi.stackexchange.com/questions/28907/how-could-one-automate-the-raspbian-raspi-config-setup#47958
 	
 if [ ! -f $daemonconfigfile ]; then
 	# Generate config file for fan speed
