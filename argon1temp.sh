@@ -1,5 +1,5 @@
-dietpi-config nonint do_i2c 0
-dietpi-config nonint do_serial 0	
+# dietpi-config nonint do_i2c 0
+# dietpi-config nonint do_serial 0	
 	
 if [ ! -f $daemonconfigfile ]; then
 	# Generate config file for fan speed
