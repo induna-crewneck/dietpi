@@ -8,6 +8,15 @@ sudo raspi-config nonint do_serial 0
 
 I'm trying to find a workaround to get it to work on the DietPi.
 
+The original script can be downloaded and executed with 
+```
+curl https://download.argon40.com/argon1.sh | bash
+```
+In the end you should be able to run this command to test it and it should not yield any errors:
+```
+systemctl restart argononed.service
+```
+
 ## Analyzing the code
 **sudo** just tells the code to run the command as root.
 
