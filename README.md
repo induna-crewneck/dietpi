@@ -1,3 +1,5 @@
+**CAUTION! Some of the stuff in this Repo is still WIP. Use at your own caution. Probably don't use any of it**
+
 # DietPi setup collection
 This is primarily for myself to keep track of how I did things. I'm learning all this as I go along and chances are if I need to redo something I'll have to start researching again. So this way I can just redo what I did the last time that worked.
 But as a byproduct this might be useful to others trying to do the stuff I did.
