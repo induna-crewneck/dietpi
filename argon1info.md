@@ -1,4 +1,22 @@
-# corresponding lines in raspi-config:
+# Getting Argon1 Fan Hat to work on DietPi
+
+The Argon 1 Fan Hat is a GPIO HAT, that controls the fan speed according to the RPis temperature. In theory, at least. The script provided doesn't work on DietPi due to lines 43 and 44:
+```
+sudo raspi-config nonint do_i2c 0
+sudo raspi-config nonint do_serial 0
+```
+
+I'm trying to find a workaround to get it to work on the DietPi.
+
+## Analyzing the code
+**sudo** just tells the code to run the command as root.
+
+**raspi-config** is replaced by dietpi-config in DietPi and for the most part it works the same. 
+
+**nonint** is the noninteractive mode that the raspi-config supports but not the dietpi-config. This is where the compatibility issues start.
+
+**do_i2c 0** enables i2c in the config.txt which for DietPi is located in /boot/. From the raspi-config code we see what exactly the command does:
+```
 do_i2c() {
   DEFAULT=--defaultno
   if [ $(get_i2c) -eq 0 ]; then
@@ -19,9 +37,10 @@ do_i2c() {
   else
     return $RET
   fi
-#
-# and
-#
+```
+
+**do_serial 0** similarly enables serial UART. Here's the raspi-config code:
+```
 do_serial() {
   DEFAULTS=--defaultno
   DEFAULTH=--defaultno
@@ -88,5 +107,30 @@ do_serial() {
       whiptail --msgbox "The serial login shell is $SSTATUS\nThe serial interface is $HSTATUS" 20 60 1
   fi
 }
-#
-# idea: add to dietpi-config file and see what it does?
+```
+
+## Workaround
+I tried placing the original raspi-config next to the dietpi-config and running the command but it seems not to work. Also adding the above code to the dietpi-config code doesn't work and sends us into the config GUI.
+
+So it seems the changes need to be made manually:
+
+### Enabling i2c
+
+The files that need to be edited seem to be '/etc/modules' and the above mentioned '/boot/config.txt'. So first, to edit the modules file
+```
+nano /etc/modules
+```
+For me it was empty, but in any case the following line needs to be added to the list:
+```
+i2c-dev
+```
+In the '/boot/config.txt' an entry needs to be changed. So edit it with
+```
+nano /boot/config.txt
+```
+and look for this:
+![i2c in config.txt](https://i.imgur.com/FqAylKA.png)
+The lines could be commented (# in the front) in which case the # needs to be removed. Also the first line should say "off" by default, so change it. In the end it should look like in the image.
+
+
+### Enabling serial
